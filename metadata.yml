@@ -1,0 +1,317 @@
+---
+id: "terraform-ibm-modules/vpc-network/ibm/1.0.0"
+name: "vpc-network"
+namespace: "terraform-ibm-modules"
+version: "1.0.0"
+providers: ["ibm"]
+description: "Terraform module to create and work with - IBM VPC Network resources on IBM Cloud"
+source: "https://github.com/terraform-ibm-modules/terraform-ibm-vpc-network"
+owner: "ibmtfprovider"
+published_at: "2021-11-30T10:34:28.911362Z"
+registry: "https://registry.terraform.io/modules/terraform-ibm-modules/vpc-network/ibm/latest"
+alias: "vpcn"
+tags: ["vpc-network","vpc","subnet","network","acl"]
+###################################
+# Root module
+###################################
+root:
+  - path: ""
+    name: "vpc-network"
+    provider_dependencies:
+      - name: "ibm"
+        namespace: "IBM-Cloud"
+        source: "IBM-Cloud/ibm"
+        version: ""
+    inputs:
+      - name: "create_vpc"
+        type: bool
+        is_required: true
+        description: "True to create new VPC. False if VPC is already existing and subnets or address prefixies are to be added"
+        example: "true"
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: false
+        is_force_new: false
+        is_provision_controller: true
+        is_count_controller: true
+      - name: "region"
+        type : string
+        is_required: true
+        description: "The location where the instance available"
+        example: "us-south"
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: false
+        is_force_new: true
+        cloud_data_type: "region"
+        cloud_data_range: "resource_group"
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "resource_group"
+        type : string
+        is_required: true
+        description: "ID of resource group"
+        example: "default"
+        is_sensitive: false
+        related_to: ["vpc", "subnets", "nwacl"]
+        is_nullable: false
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "unique_subnet_prefix"
+        type : string
+        is_required: true
+        description: "Unique prefix for the network resources"
+        example: "exampletest"
+        is_sensitive: false
+        related_to: ["public_gateways", "subnets"]
+        is_nullable: false
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "vpc_name"
+        type : string
+        is_required: true
+        description: "Name of the vpc"
+        example: "vpctest"
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: false
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "classic_access"
+        type : bool
+        is_required: false
+        default_value: false
+        description: "Classic Access to the VPC"
+        example: true
+        is_sensitive: false
+        allowed_values: [true,false]
+        related_to: ["vpc"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "default_address_prefix"
+        type : string
+        is_required: false
+        description: "Default address prefix creation method"
+        example: "auto"
+        is_sensitive: false
+        allowed_values: ["auto","manual"]
+        related_to: ["vpc"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "default_network_acl_name"
+        type : string
+        is_required: false
+        description: "Name of the Default ACL"
+        example: "acl1"
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "default_security_group_name"
+        type : string
+        is_required: false
+        description: "Name of the Default Security Group"
+        example: "sg1"
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "default_routing_table_name"
+        type : string
+        is_required: false
+        description: "Name of the Default Routing Table"
+        example: "rt1"
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "vpc_tags"
+        type : list(string)
+        is_required: false
+        description: "Tags to attach to vpc instance"
+        example: ["T1","T2"]
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "routing_table_list"
+        type : list(object)
+        is_required: false
+        description: "List of Routing tables"
+        is_sensitive: false
+        related_to: ["vpc"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "enable_gateway"
+        type: bool
+        is_required: true
+        description: "Controls the provisioning of public gateway"
+        example: true
+        is_sensitive: false
+        related_to: ["public_gateways"]
+        allowed_values: [true,false]
+        is_nullable: false
+        is_force_new: true
+        is_provision_controller: true
+        is_count_controller: true
+      - name: "floating_ip"
+        type : map(any)
+        is_required: false
+        description: "Floating IP `id`'s or `address`'es that you want to assign to the public gateway"
+        is_sensitive: false
+        related_to: ["public_gateways"]
+        is_nullable: true
+        is_force_new: true
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "gateway_tags"
+        type : list(string)
+        is_required: false
+        description: "Tags to attach to public gateways"
+        example: ["T1","T2"]
+        is_sensitive: false
+        related_to: ["public_gateways"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "cidr_blocks"
+        type : list(string)
+        is_required: false
+        description: "CIDR blocks for subnets to be created and whether or not they are default to the subnet's zone. If no CIDR blocks are provided, it will create subnets with 256 total ipv4 addresses"
+        example: ["10.10.10.0/24,false", "10.10.11.0/24,", "10.10.12.0/24,"]
+        is_sensitive: false
+        related_to: ["subnets"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "subnets_per_zone"
+        type : number
+        is_required: false
+        description: "Number of subnets per zone"
+        example: 1
+        is_sensitive: false
+        related_to: ["subnets"]
+        is_nullable: false
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "number_of_zones"
+        type : number
+        is_required: false
+        description: "Number of zones to deploy subnets in"
+        example: 3
+        is_sensitive: false
+        related_to: ["subnets"]
+        is_nullable: false
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "total_ipv4_address_count"
+        type : number
+        is_required: false
+        description: "The total number of IPv4 addresses in this subnet"
+        example: 256
+        is_sensitive: false
+        related_to: ["subnets"]
+        is_nullable: true
+        is_force_new: true
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "ip_version"
+        type : string
+        is_required: false
+        description: "IP Version"
+        example: "ipv4"
+        is_sensitive: false
+        related_to: ["subnets"]
+        is_nullable: true
+        allowed_values: ["ipv4"]
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "subnet_tags"
+        type : list(string)
+        is_required: false
+        description: "A list of tags to be applied to subnets"
+        example: ["T1","T2"]
+        is_sensitive: false
+        related_to: ["subnets"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "access_tags"
+        type : list(string)
+        is_required: false
+        description: "A list of access management tags of subnets"
+        example: ["T1","T2"]
+        is_sensitive: false
+        related_to: ["subnets"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "enable_acl"
+        type : bool
+        is_required: false
+        default_value: false
+        description: "Enable this flag to attach acl id to subnet"
+        example: true
+        is_sensitive: false
+        related_to: ["nwacl","subnets"]
+        is_nullable: false
+        allowed_values: [true,false]
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "acl_name"
+        type : string
+        is_required: false
+        description: "Name of the Network ACL"
+        example: "aclnew"
+        is_sensitive: false
+        related_to: ["nwacl"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "acl_rules"
+        type : list(object)
+        is_required: false
+        description: "List of rules that are to be attached to the Network ACL"
+        is_sensitive: false
+        related_to: ["nwacl"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false
+      - name: "acl_tags"
+        type : list(string)
+        is_required: false
+        description: "List of Tags for the ACL"
+        example: ["T1","T2"]
+        is_sensitive: false
+        related_to: ["nwacl"]
+        is_nullable: true
+        is_force_new: false
+        is_provision_controller: false
+        is_count_controller: false

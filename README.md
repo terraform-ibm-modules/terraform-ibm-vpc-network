@@ -3,50 +3,9 @@ Terraform Module Repository which creates IBM VPC Network infrastructure
 
 This module a collection of modules that make it easier to provision VPC Network resources.
 
-Scenarios to construct sub-modules
-
-1. Most commonly used basic VPC infrastructure which consists of a vpc, it's child resources and subnets
-2. Allowing public Gateway access to the VPC Zones.
-3. Attach flow logs to a vpc/subnet/instance
-4. Network Security which includes creation of Security groups, Network ACLs, VPNs
-5. Load Balancing
-6. Private Endpoint creation on VPC
-
 ## Compatibility
 
 This module is meant for use with Terraform 0.13 (and higher).
-
-## Usage
-
-Examples are captured in [examples](./examples/) folder, demonstarte how to use a module through a template:
-
-e.g:
-
-```hcl
-provider "ibm" {
-}
-
-data "ibm_resource_group" "logdna" {
-  name = var.resource_group
-}
-
-module "logdna_instance" {
-  source  = "terraform-ibm-modules/observability/ibm//modules/logging-logdna"
-
-
-  bind_resource_key   = var.bind_resource_key
-  service_name        = var.service_name
-  resource_group_id   = data.ibm_resource_group.logdna.id
-  plan                = var.plan
-  region              = var.region
-  service_endpoints   = var.service_endpoints
-  tags                = var.tags
-  resource_key_name   = var.resource_key_name
-  role                = var.role
-  resource_key_tags   = var.resource_key_tags
-}
-
-```
 
 ## Requirements
 
@@ -103,4 +62,49 @@ terraform destroy -var-file=./input.tfvars
 
 All optional parameters, by default, will be set to `null` in respective example's variable.tf file. You can also override these optional parameters.
 
+## Inputs
 
+| Name                              | Description                                           | Type   | Default | Required |
+|-----------------------------------|-------------------------------------------------------|--------|---------|----------|
+| create\_vpc | True to create new VPC. False if VPC is already existing and subnets, gateways are to be added to it | bool | n/a | yes |
+| vpc\_name | Name of the vpc. Required only if Creating a new VPC | string | n/a | yes |
+| region | Region in which resources are to be created | string | "us-south" | no |
+| resource\_group | Name of the resource group | string | n/a | no |
+| classic\_access | Indicates whether this VPC should be connected to Classic Infrastructure. | bool | false | no |
+| default\_address\_prefix | Indicates whether a default address prefix should be automatically created for each zone in this VPC.  | string | auto | no |
+| default\_network\_acl\_name | Name of the Default ACL of the VPC | string | n/a | no |
+| default\_security\_group\_name | Name of the Default Security Group of the VPC | string | n/a | no |
+| default\_routing\_table\_name | Name of the Default Routing Table of the VPC  | string | n/a | no |
+| vpc\_tags | List of tags to attach to the VPC | list(string) | n/a | no |
+| routing\_table\_list | List of Routing tables | list(object) | n/a | no |
+| enable\_gateway | True to create new Public Gateways | bool | false | no |
+| floating\_ip | Floating IP `id` or `address` that you want to assign to the public gateway | map | n/a | no |
+| gateway\_tags | List of Tags for the gateway | list(string) | n/a | no |
+| unique\_subnet\_prefix | Name(or Prefix) of the Subnet(s). Required only while Creating a new subnet(s) | string | n/a | no |
+| cidr\_blocks | CIDR blocks for subnets to be created and whether or not they are default to the subnet's zone. If no CIDR blocks are provided, it will create subnets with 256 total ipv4 addresses | list(string) | ["10.10.10.0/24,false", "10.10.11.0/24,", "10.10.12.0/24,"] | no |
+| subnets\_per\_zone | Number of subnets per zone | number | 1 | no |
+| number\_of\_zones | Number of zones to deploy subnets in | number | 3 | no |
+| total\_ipv4\_address\_count | Number of IPV4 Addresses. Required only while Creating a new subnet(s) | number | 256 | no |
+| ip\_version | IP Version of the subnets  | string | n/a | no |
+| subnet\_tags | A list of tags to be applied to subnets | list(string) | n/a | no |
+| access\_tags | A list of access management tags of subnets | list(string) | n/a | no |
+| enable\acl | True to create new ACL | bool | false | no |
+| acl\_name | Name of the Network ACL | string | n/a | yes |
+| acl\_rules | List of Network ACL Rules that are to be attached to the ACL  | list(object) | n/a | no |
+| acl\_tags | List of tags to attach to ACL | list(string) | n/a | no |
+
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| vpc\_id | The ID of the VPC |
+| vpc\_default\_security\_group |The ID of the vpc default security group |
+| vpc\_default\_network\_acl | The ID of the vpc default network acl |
+| vpc\_default\_routing\_table | The ID of the vpc default Routing Table |
+| vpc\_address\_prefixes | The ID(s) of the Address Prefixes to VPC |
+| vpc\_address\_prefixes\_cidr | The Address Prefix CIDRs of the VPC |
+| subnet\_ids | The ID(s) of the Subnet(s) |
+| subnet\_ipv4\_cidrs | IPV4 subnet CIDR blocks |
+| public\_gateway\_ids | The ID(s) of the Public Gateway(s) |
+| network\_acl\_id | The ID of the Network ACL |
